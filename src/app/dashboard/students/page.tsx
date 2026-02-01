@@ -134,7 +134,11 @@ export default function StudentsPage() {
             })
 
             if (enrollError) {
-                setError('Error al asignar: ' + enrollError.message)
+                if (enrollError.code === '23505') {
+                    setError('El estudiante ya está inscrito en este curso')
+                } else {
+                    setError('Error al asignar: ' + enrollError.message)
+                }
             } else {
                 setSuccess('Estudiante asignado exitosamente')
                 setSelectedStudent('')
