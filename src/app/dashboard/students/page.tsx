@@ -73,7 +73,7 @@ export default function StudentsPage() {
         fetchCourses()
     }, [])
 
-    const handleAddStudent = (e: React.FormEvent) => {
+    const handleAddStudent = async (e: React.FormEvent) => {
         e.preventDefault()
         setError(null)
         setSuccess(null)
@@ -115,7 +115,7 @@ export default function StudentsPage() {
         }
     }
 
-    const handleAssignToCourse = (e: React.FormEvent) => {
+    const handleAssignToCourse = async (e: React.FormEvent) => {
         e.preventDefault()
         setError(null)
         setSuccess(null)
