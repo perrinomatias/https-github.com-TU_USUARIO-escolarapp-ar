@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "db:setup": "npx supabase db push",
-    "build": "rm -rf .next && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
