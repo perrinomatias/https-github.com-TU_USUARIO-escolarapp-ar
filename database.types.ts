@@ -281,5 +281,14 @@ export type Database = {
                 }
             }
         }
+        Views: {
+            student_subject_averages: {
+                Row: {
+                    student_id: string
+                    course_subject_id: string
+                    average_score: number
+                }
+            }
+        }
     }
 }
