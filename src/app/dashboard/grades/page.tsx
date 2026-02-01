@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/lib/db'
 import { FileText, Award, TrendingUp, AlertCircle } from 'lucide-react'
 import clsx from 'clsx'
 

@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/lib/db'
 import { BookOpen, UserCheck, Save, Award } from 'lucide-react'
 
 // Mock types
