@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useTransition } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/db'
 import { Users, Plus, Loader2, Mail, User, GraduationCap } from 'lucide-react'
 import Modal from '@/components/ui/Modal'
@@ -29,7 +29,7 @@ export default function StudentsPage() {
     const [email, setEmail] = useState('')
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
-    const [isPending, startTransition] = useTransition()
+    const [actionLoading, setActionLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
 
@@ -83,7 +83,9 @@ export default function StudentsPage() {
             return
         }
 
-        startTransition(async () => {
+        setActionLoading(true)
+
+        try {
             // Create profile (simplified - assumes auth user exists or is created elsewhere)
             const { error: profileError } = await supabase.from('profiles').insert({
                 email: email.trim(),
@@ -105,7 +107,12 @@ export default function StudentsPage() {
                     fetchStudents()
                 }, 1500)
             }
-        })
+        } catch (err) {
+            console.error(err)
+            setError('Ocurrió un error inesperado')
+        } finally {
+            setActionLoading(false)
+        }
     }
 
     const handleAssignToCourse = (e: React.FormEvent) => {
@@ -118,7 +125,9 @@ export default function StudentsPage() {
             return
         }
 
-        startTransition(async () => {
+        setActionLoading(true) // Use the existing or new loading state? Better create a specific one for actions.
+
+        try {
             const { error: enrollError } = await supabase.from('enrollments').insert({
                 student_id: selectedStudent,
                 course_id: selectedCourse
@@ -135,7 +144,12 @@ export default function StudentsPage() {
                     setSuccess(null)
                 }, 1500)
             }
-        })
+        } catch (err) {
+            console.error(err)
+            setError('Ocurrió un error inesperado')
+        } finally {
+            setActionLoading(false)
+        }
     }
 
     return (
@@ -278,10 +292,10 @@ export default function StudentsPage() {
                         </button>
                         <button
                             type="submit"
-                            disabled={isPending}
+                            disabled={actionLoading}
                             className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors"
                         >
-                            {isPending ? (
+                            {actionLoading ? (
                                 <>
                                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
                                     Agregando...
@@ -358,10 +372,10 @@ export default function StudentsPage() {
                         </button>
                         <button
                             type="submit"
-                            disabled={isPending}
+                            disabled={actionLoading}
                             className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors"
                         >
-                            {isPending ? (
+                            {actionLoading ? (
                                 <>
                                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
                                     Asignando...
