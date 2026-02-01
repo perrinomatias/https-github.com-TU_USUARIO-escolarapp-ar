@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "db:setup": "npx supabase db push",
-    "build": "next build",
+    "build": "find src/lib -name \"*.ts\" && next build",
     "start": "next start",
     "lint": "eslint"
   },
