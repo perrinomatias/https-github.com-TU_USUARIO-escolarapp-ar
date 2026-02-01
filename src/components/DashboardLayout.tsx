@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supaBaseClient'
+import { supabase } from '@/lib/supabaseClient'
 import {
     Menu, X, Home, User, BookOpen, Calendar,
     LogOut, GraduationCap, FileText, Settings

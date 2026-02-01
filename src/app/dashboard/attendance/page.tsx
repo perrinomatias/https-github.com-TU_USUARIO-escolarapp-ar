@@ -2,20 +2,23 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
-import { supabase } from '@/lib/supaBaseClient'
+import { supabase } from '@/lib/supabaseClient'
 import { Calendar, Save, CheckCircle2, XCircle } from 'lucide-react'
 import clsx from 'clsx'
 
 // Types (Ideally move to /types)
+// Types (Ideally move to /types)
 type Course = { id: string; name: string }
 type Student = { id: string; first_name: string; last_name: string }
-type AttendanceRecord = { student_id: string; status: 'present' | 'absent' }
+// Update type to match Schema
+type AttendanceStatus = 'presente' | 'ausente_injustificado' | 'ausente_justificado' | 'tarde'
 
 export default function AttendancePage() {
     const [courses, setCourses] = useState<Course[]>([])
     const [selectedCourse, setSelectedCourse] = useState<string>('')
     const [students, setStudents] = useState<Student[]>([])
-    const [attendance, setAttendance] = useState<Record<string, 'present' | 'absent'>>({})
+    // Update state type
+    const [attendance, setAttendance] = useState<Record<string, AttendanceStatus>>({})
     const [isPending, startTransition] = useTransition()
     const [lastSaved, setLastSaved] = useState<Date | null>(null)
 
@@ -37,19 +40,22 @@ export default function AttendancePage() {
             const { data, error } = await supabase
                 .from('enrollments')
                 .select(`
-          student_id,
-          profiles:student_id (id, first_name, last_name)
-        `)
+              student_id,
+              profiles:student_id (id, first_name, last_name)
+            `)
                 .eq('course_id', selectedCourse)
 
             if (data) {
                 // @ts-ignore: complex join typing
-                const mappedStudents = data.map(item => item.profiles)
+                const mappedStudents = data.map(item => item.profiles).flat() as unknown as Student[]
                 setStudents(mappedStudents)
 
                 // Reset attendance draft
-                const initialAttendance: Record<string, 'present' | 'absent'> = {}
-                mappedStudents.forEach((s: any) => initialAttendance[s.id] = 'absent')
+                const initialAttendance: Record<string, AttendanceStatus> = {}
+                // Default to 'ausente_injustificado' or 'presente'? Usually present.
+                // Let's default to 'ausente_injustificado' as per previous code logic (which seemed to default to absent?)
+                // Previous code: mappedStudents.forEach((s: any) => initialAttendance[s.id] = 'absent')
+                mappedStudents.forEach((s: any) => initialAttendance[s.id] = 'ausente_injustificado')
                 setAttendance(initialAttendance)
             }
         }
@@ -60,7 +66,7 @@ export default function AttendancePage() {
     const toggleAttendance = (studentId: string) => {
         setAttendance(prev => ({
             ...prev,
-            [studentId]: prev[studentId] === 'present' ? 'absent' : 'present'
+            [studentId]: prev[studentId] === 'presente' ? 'ausente_injustificado' : 'presente'
         }))
     }
 
@@ -133,7 +139,7 @@ export default function AttendancePage() {
                                 </tr>
                             ) : (
                                 students.map((student) => (
-                                    <tr key={student.id} className={clsx("transition-colors", attendance[student.id] === 'present' ? 'bg-indigo-50/50' : '')}>
+                                    <tr key={student.id} className={clsx("transition-colors", attendance[student.id] === 'presente' ? 'bg-indigo-50/50' : '')}>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                             {student.last_name}, {student.first_name}
                                         </td>
@@ -142,14 +148,14 @@ export default function AttendancePage() {
                                                 onClick={() => toggleAttendance(student.id)}
                                                 className={clsx(
                                                     "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
-                                                    attendance[student.id] === 'present' ? 'bg-indigo-600' : 'bg-gray-200'
+                                                    attendance[student.id] === 'presente' ? 'bg-indigo-600' : 'bg-gray-200'
                                                 )}
                                             >
                                                 <span
                                                     aria-hidden="true"
                                                     className={clsx(
                                                         "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
-                                                        attendance[student.id] === 'present' ? 'translate-x-5' : 'translate-x-0'
+                                                        attendance[student.id] === 'presente' ? 'translate-x-5' : 'translate-x-0'
                                                     )}
                                                 />
                                             </button>

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supaBaseClient'
+import { supabase } from '@/lib/supabaseClient'
 import DashboardLayout from '@/components/DashboardLayout'
 import { UserProfile } from '@/types'
 import { Loader2, Users, BookOpen, CalendarCheck, Award, MessageCircle } from 'lucide-react'
